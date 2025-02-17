@@ -34,7 +34,7 @@ st.title("📊 Customer Attrition Analysis AI")
 uploaded_file = st.file_uploader("Upload Customer ARR Excel File", type=["xlsx"])
 
 if uploaded_file:
-    df = pd.read_excel(uploaded_file)
+    df = pd.read_excel(uploaded_file, engine='openpyxl')
 
     # Calculate attrition
     attrition_rates, avg_attrition = calculate_attrition(df)
