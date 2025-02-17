@@ -1,4 +1,13 @@
 import streamlit as st
+import traceback
+
+try:
+    st.write("✅ Debugging: The app started successfully.")
+except Exception as e:
+    st.error("⚠️ An error occurred.")
+    st.text(traceback.format_exc())  # This will show the full error
+
+import streamlit as st
 st.write("✅ The app is running successfully!")
 
 def calculate_revenue_attrition(df):
