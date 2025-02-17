@@ -1,3 +1,6 @@
+import streamlit as st
+st.write("✅ The app is running successfully!")
+
 def calculate_revenue_attrition(df):
     years = df.columns[1:]  # Get year columns
     attrition_rates = []
