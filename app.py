@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# Function to calculate revenue-based attrition including shrinkage and loss separately
+# Function to calculate revenue-based attrition (Loss % and Shrink % separately)
 def calculate_revenue_attrition(df):
     years = df.columns[1:]  # Get year columns
     attrition_data = []
@@ -13,25 +13,26 @@ def calculate_revenue_attrition(df):
         # Total revenue in the previous year
         total_revenue_previous = df[previous_year].sum()
 
-        # Revenue lost (customers who went from positive revenue to 0)
+        # Revenue lost (customers who stopped paying entirely)
         lost_revenue = df[(df[previous_year] > 0) & (df[current_year] == 0)][previous_year].sum()
         loss_percentage = (lost_revenue / total_revenue_previous) * 100 if total_revenue_previous > 0 else 0
 
         # Revenue shrinkage (customers who paid less than last year)
-        shrinkage_revenue = df[(df[current_year] < df[previous_year])][previous_year].sum() - df[(df[current_year] < df[previous_year])][current_year].sum()
+        shrink_customers = df[df[current_year] < df[previous_year]]
+        shrinkage_revenue = (shrink_customers[previous_year] - shrink_customers[current_year]).sum()
         shrinkage_percentage = (shrinkage_revenue / total_revenue_previous) * 100 if total_revenue_previous > 0 else 0
 
-        # Total revenue attrition (loss + shrinkage)
-        total_attrition_revenue = lost_revenue + shrinkage_revenue
-        attrition_rate = (total_attrition_revenue / total_revenue_previous) * 100 if total_revenue_previous > 0 else 0
+        # Total revenue attrition (Loss % + Shrinkage %)
+        total_attrition_rate = loss_percentage + shrinkage_percentage
 
-        attrition_data.append([f"{previous_year} → {current_year}", round(loss_percentage, 2), round(shrinkage_percentage, 2), round(attrition_rate, 2)])
+        attrition_data.append([f"{previous_year} → {current_year}", round(loss_percentage, 2), round(shrinkage_percentage, 2), round(total_attrition_rate, 2)])
 
-    # Calculate average values
+    # Compute average values
     avg_loss = sum([row[1] for row in attrition_data]) / len(attrition_data)
     avg_shrinkage = sum([row[2] for row in attrition_data]) / len(attrition_data)
     avg_total_attrition = sum([row[3] for row in attrition_data]) / len(attrition_data)
 
+    # Append the average row
     attrition_data.append(["Average Revenue Attrition", round(avg_loss, 2), round(avg_shrinkage, 2), round(avg_total_attrition, 2)])
 
     return attrition_data
